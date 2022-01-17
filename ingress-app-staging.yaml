@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
-  - host: todo.tsubekti.my.id
+  - host: todo-staging.tsubekti.my.id
     http:
       paths:
       - backend:

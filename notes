@@ -1,9 +1,9 @@
  cluster dibagi menjadi 2 namespace (staging dan production)
 
-- untuk fornt end ganti yg berkaitan dengan axioss post dengan subdomain backend, cth api.tsubekti.my.id:4000/todos
-
-kubectl create configMap mongodb-config-file --from-file=conf=mongodb.conf
-
+			sed -i 's/DockerImage/'"${DockerImage}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
+			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
+pada deployment fe dan be ganti dockerimage dan dockertag
+  
 resource "null_resource" "ec2-instance"{
 
   triggers = {

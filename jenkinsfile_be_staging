@@ -1,0 +1,88 @@
+node {
+    dir ("${env.BUILD_ID}") {
+		def APP_REPO_URL = ""
+		def CREDENTIAL_ID = ""
+
+        checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[
+			credentialsId: "${CREDENTIAL_ID}", 
+			url: "${APP_REPO_URL}"]], 
+			branches: [[name: "refs/tags/{tag}"]
+		]]       
+		def DOCKER_IMAGE = "tsubekti/todo-app-be"
+        def DOCKER_TAG = gitTag()
+	    
+		def NAMESPACE = "production"
+		def MANIFEST_PATH = "backend"
+		
+        currentBuild.displayName="#${BUILD_NUMBER}, ${JOB_NAME}, ${DOCKER_TAG}"
+        try {
+            stage ('Docker Build') {
+                echo 'Docker Build'
+                buildImage(DOCKER_IMAGE, DOCKER_TAG)    
+            }
+            stage ('Docker Push') {
+                echo 'Docker Push'
+                pushImage(DOCKER_IMAGE, DOCKER_TAG)    
+            }
+            stage ('Deploy to k8s') {
+                echo 'Deploy to k8s'
+                deployK8s(DOCKER_IMAGE, DOCKER_TAG, K8S_NAMESPACE, K8S_MANIFEST_PATH, WORKSPACE, BUILD_ID)    
+            }
+        }
+    } //dir
+} //node
+
+def buildImage(String DockerImage, String DockerTag) {
+	echo "Build Image"
+
+		sh """
+			#!/bin/bash
+			sudo docker build -t ${DockerImage}:${DockerTag} .
+		"""
+}
+
+def pushImage(String DockerImage, String DockerTag) {
+	echo "Build Image"
+
+		sh """
+			#!/bin/bash
+			sudo docker push ${DockerImage}:${DockerTag}
+			sudo docker rmi ${DockerImage}:${DockerTag}
+		"""
+}
+
+def deployK8s(String DockerImage, String DockerTag, String K8sNamespace, String ManifestPath, String Workspace, String BuildId) {
+	echo "Deploy to k8s"
+
+		sh """
+			#!/bin/bash
+			sed -i 's/DockerImage/'"${DockerImage}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
+			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
+			kubectl apply -f ./${ManifestPath}/service.yaml --namespace=${Namespace}
+			kubectl apply -f ./${ManifestPath}/deployment.yaml --namespace=${Namespace}
+		"""
+}
+
+//for grab git tag
+String gitTag() {
+    commit = getCommit()
+    if (commit) {
+        desc = sh(script: "git describe --tags ${commit}", returnStdout: true)?.trim()
+        if (isTag(desc)) {
+            return desc
+        }
+    }
+    return null
+}
+
+String getCommit() {
+    return sh(script: 'git rev-parse HEAD', returnStdout: true)?.trim()
+}
+ 
+@NonCPS
+boolean isTag(String desc) {
+    match = desc =~ /.+-[0-9]+-g[0-9A-Fa-f]{6,}$/
+    result = !match
+    match = null // prevent serialisation
+    return result
+}
