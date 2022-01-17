@@ -1,0 +1,68 @@
+#install docker
+- hosts: aws
+  remote_user: ubuntu
+  become: true
+  tasks:
+  - name: update
+    apt:
+      update_cache: yes
+  - name: install depedencies
+    apt:
+      name: "{{item}}"
+      state: present
+      update_cache: yes
+    loop:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+- name: add GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+- name: repository docker
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+- name: install docker
+      apt:
+        name: "{{item}}"
+        state: latest
+        update_cache: yes
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+- name: start docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+handlers:
+    - name: restart docker
+      service: 
+        name: docker 
+        state: restarted
+
+#install jenkins
+- name: add jenkins key
+  apt_key:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+- name: "Set key to apt repository"
+  apt_repository:
+      repo: deb https://pkg.jenkins.io/debian-stable binary/
+      state: present
+- name: "Install open jdk 11"
+  apt:
+      name: openjdk-11-jre-headless
+      state: present
+- name: install jenkins
+  apt:
+      name: jenkins
+      state: present
+- name: "Starting jenkins"
+  service:
+      name: "jenkins"
+      state: started
+      enabled: yes
