@@ -1,0 +1,57 @@
+node {
+    dir ("${env.BUILD_ID}") {
+		def APP_REPO_URL = "https://github.com/Tsubekti/MERN-stack-AWS.git"
+
+        checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[
+			url: "${APP_REPO_URL}"]], 
+			branches: [[name: "refs/tags/{tag}"]
+		]]       
+		def DOCKER_IMAGE = "tsubekti/todo-app-be"
+        def DOCKER_TAG = gitTag()
+	    
+		def NAMESPACE = "production"
+		def MANIFEST_PATH = "backend"
+		
+        currentBuild.displayName="#${BUILD_NUMBER}, ${JOB_NAME}, ${DOCKER_TAG}"
+        try {
+            stage ('Docker Pull') {
+                echo 'Docker Pull'
+                pullImage(DOCKER_IMAGE, DOCKER_TAG)    
+            }
+        }
+    } //dir
+} //node
+
+def pullImage(String DockerImage, String DockerTag) {
+	echo "Docker Pull"
+
+		sh """
+			#!/bin/bash
+			cd /${WORKSPACE}/${BUILD_ID}/mern-todo-app && ls -la
+		"""
+}
+
+
+//for grab git tag
+String gitTag() {
+    commit = getCommit()
+    if (commit) {
+        desc = sh(script: "git describe --tags ${commit}", returnStdout: true)?.trim()
+        if (isTag(desc)) {
+            return desc
+        }
+    }
+    return null
+}
+
+String getCommit() {
+    return sh(script: 'git rev-parse HEAD', returnStdout: true)?.trim()
+}
+ 
+@NonCPS
+boolean isTag(String desc) {
+    match = desc =~ /.+-[0-9]+-g[0-9A-Fa-f]{6,}$/
+    result = !match
+    match = null // prevent serialisation
+    return result
+}
