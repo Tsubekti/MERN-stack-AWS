@@ -4,6 +4,16 @@
 			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
 pada deployment fe dan be ganti dockerimage dan dockertag
   
+  
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "500Mi"
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+	    
+	    
 resource "null_resource" "ec2-instance"{
 
   triggers = {
