@@ -44,7 +44,7 @@ def pushImage(String DockerImage, String DockerTag) {
 
 		sh """
 			#!/bin/bash
-            cat ${JENKINS_HOME}/cred.txt | docker login -u tsubekti --password-stdin
+            cat ${JENKINS_HOME}/cred.txt | sudo docker login -u tsubekti --password-stdin
 			sudo docker push ${DockerImage}:${DockerTag}
 			sudo docker rmi ${DockerImage}:${DockerTag}
 		"""
