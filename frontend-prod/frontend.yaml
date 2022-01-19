@@ -23,11 +23,11 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: tsubekti/todo-app-fe:v5
+          image: tsubekti/todo-app-fe:v10
           resources:
             limits:
-              cpu: "200m"
-              memory: "200Mi"
+              cpu: "400m"
+              memory: "400Mi"
             requests:
-              cpu: "100m"
-              memory: "100Mi"
+              cpu: "400m"
+              memory: "400Mi"

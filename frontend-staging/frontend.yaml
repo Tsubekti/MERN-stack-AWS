@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app-fe
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: todo-app
+      tier: frontend
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: todo-app
+        tier: frontend
+        track: stable
+    spec:
+      containers:
+        - name: todo-app
+          image: tsubekti/todo-app-fe-staging:v1
+          resources:
+            limits:
+              cpu: "400m"
+              memory: "400Mi"
+            requests:
+              cpu: "400m"
+              memory: "400Mi"
