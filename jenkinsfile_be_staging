@@ -35,7 +35,7 @@ def buildImage(String DockerImage, String DockerTag) {
 
 		sh """
 			#!/bin/bash
-			sudo docker build -t ${DockerImage}:${DockerTag} .
+			cd mern-todo-app-backend/backend/ && sudo docker build -t ${DockerImage}:${DockerTag} .
 		"""
 }
 
@@ -56,8 +56,8 @@ def deployK8s(String DockerImage, String DockerTag, String Namespace, String Man
 			#!/bin/bash
 			sed -i 's/DockerImage/'"${DockerImage}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
 			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
-			kubectl apply -f ./${ManifestPath}/service.yaml --namespace=${Namespace}
-			kubectl apply -f ./${ManifestPath}/deployment.yaml --namespace=${Namespace}
+			kubectl apply -f ${Workspace}/${BuildId}/${ManifestPath}/service.yaml --namespace=${Namespace}
+			kubectl apply -f ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml --namespace=${Namespace}
 		"""
 }
 
