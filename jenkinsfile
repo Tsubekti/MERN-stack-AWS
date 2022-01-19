@@ -14,11 +14,22 @@ node {
 		
         currentBuild.displayName="#${BUILD_NUMBER}, ${JOB_NAME}, ${DOCKER_TAG}"
         try {
+         notifyBuild('STARTED', APP_NAME, TAG_NUMBER)
+
             stage ('Docker Pull') {
                 echo 'Docker Pull'
                 pullImage(DOCKER_IMAGE, DOCKER_TAG)    
             }
+          }   catch (e) {
+            // If there was an exception thrown, the build failed
+            currentBuild.result = "FAILED"
+            throw e
+        } finally {
+            // Success or failure, always send notifications
+            notifyBuild(currentBuild.result, APP_NAME, TAG_NUMBER)
+            cleanWs()
         }
+        
     } //dir
 } //node
 
