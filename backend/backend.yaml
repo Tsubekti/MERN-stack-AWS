@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: DockerImage:DockerTag
+          image: tsubekti/todo-app-be:DockerTag
           ports:
             - name: http
               containerPort: 80
