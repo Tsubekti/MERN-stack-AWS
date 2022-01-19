@@ -19,7 +19,6 @@ node {
                 echo 'Docker Pull'
                 pullImage(DOCKER_IMAGE, DOCKER_TAG)    
             }
-            cleanWS()  
         
     } //dir
 } //node
