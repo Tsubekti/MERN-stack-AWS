@@ -35,7 +35,7 @@ def buildImage(String DockerImage, String DockerTag) {
 
 		sh """
 			#!/bin/bash
-			cd mern-todo-app-backend/backend/ && sudo docker build -t ${DockerImage}:${DockerTag} .
+			cd ${Workspace}/${BuildId}/mern-todo-app-backend/backend/ && sudo docker build -t ${DockerImage}:${DockerTag} .
 		"""
 }
 
