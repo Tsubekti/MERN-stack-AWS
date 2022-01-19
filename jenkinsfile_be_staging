@@ -55,9 +55,9 @@ def deployK8s(String DockerImage, String DockerTag, String Namespace, String Man
 
 		sh """
 			#!/bin/bash
-			sed -i 's/DockerTag/'"${DockerTag}"'/g' ${WORKSPACE}/${BUILD_ID}/${ManifestPath}/deployment.yaml
+			sed -i 's/DockerTag/'"${DockerTag}"'/g' ${WORKSPACE}/${BUILD_ID}/${ManifestPath}/backend.yaml
 			kubectl apply -f ${WORKSPACE}/${BUILD_ID}/${ManifestPath}/service.yaml --namespace=${Namespace}
-			kubectl apply -f ${WORKSPACE}/${BUILD_ID}/${ManifestPath}/deployment.yaml --namespace=${Namespace}
+			kubectl apply -f ${WORKSPACE}/${BUILD_ID}/${ManifestPath}/backend.yaml --namespace=${Namespace}
 		"""
 }
 
