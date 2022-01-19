@@ -4,9 +4,9 @@ node {
 
         checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[
 			url: "${APP_REPO_URL}"]], 
-			branches: [[name: "refs/tags/{tag}"]
+			branches: [[name: "refs/tags/${tag}"]
 		]]       
-		def DOCKER_IMAGE = "tsubekti/todo-app-fe"
+		def DOCKER_IMAGE = "tsubekti/todo-app-fe-staging"
         def DOCKER_TAG = gitTag()
 	    
 		def NAMESPACE = "staging"
@@ -35,7 +35,7 @@ def buildImage(String DockerImage, String DockerTag) {
 
 		sh """
 			#!/bin/bash
-			sudo docker build -t ${DockerImage}:${DockerTag} .
+			cd ${WORKSPACE}/${BUILD_ID}/mern-todo-app-frontend-staging/frontend/ && sudo docker build -t ${DockerImage}:${DockerTag} .
 		"""
 }
 
@@ -44,6 +44,7 @@ def pushImage(String DockerImage, String DockerTag) {
 
 		sh """
 			#!/bin/bash
+            cat ${JENKINS_HOME}/cred.txt | sudo docker login -u tsubekti --password-stdin
 			sudo docker push ${DockerImage}:${DockerTag}
 			sudo docker rmi ${DockerImage}:${DockerTag}
 		"""
@@ -54,10 +55,9 @@ def deployK8s(String DockerImage, String DockerTag, String Namespace, String Man
 
 		sh """
 			#!/bin/bash
-			sed -i 's/DockerImage/'"${DockerImage}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
-			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
+			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/frontend.yaml
 			kubectl apply -f ./${ManifestPath}/service.yaml --namespace=${Namespace}
-			kubectl apply -f ./${ManifestPath}/deployment.yaml --namespace=${Namespace}
+			kubectl apply -f ./${ManifestPath}/frontend.yaml --namespace=${Namespace}
 		"""
 }
 

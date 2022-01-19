@@ -4,7 +4,7 @@ node {
 
         checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[
 			url: "${APP_REPO_URL}"]], 
-			branches: [[name: "refs/tags/{tag}"]
+			branches: [[name: "refs/tags/${tag}"]
 		]]       
 		def DOCKER_IMAGE = "tsubekti/todo-app-be"
         def DOCKER_TAG = gitTag()
@@ -31,6 +31,7 @@ def pullImage(String DockerImage, String DockerTag) {
 
 		sh """
 			#!/bin/bash
+            cat ${JENKINS_HOME}/cred.txt | sudo docker login -u tsubekti --password-stdin
 			docker pull ${DockerImage}:${DockerTag}
 		"""
 }
@@ -40,10 +41,9 @@ def deployK8s(String DockerImage, String DockerTag, String Namespace, String Man
 
 		sh """
 			#!/bin/bash
-			sed -i 's/DockerImage/'"${DockerImage}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
-			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/deployment.yaml
+			sed -i 's/DockerTag/'"${DockerTag}"'/g'  ${Workspace}/${BuildId}/${ManifestPath}/backend.yaml
 			kubectl apply -f ./${ManifestPath}/service.yaml --namespace=${Namespace}
-			kubectl apply -f ./${ManifestPath}/deployment.yaml --namespace=${Namespace}
+			kubectl apply -f ./${ManifestPath}/backend.yaml --namespace=${Namespace}
 		"""
 }
 
