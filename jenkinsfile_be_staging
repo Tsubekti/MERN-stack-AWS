@@ -13,7 +13,7 @@ node {
 		def MANIFEST_PATH = "backend"
 		
         currentBuild.displayName="#${BUILD_NUMBER}, ${JOB_NAME}, ${DOCKER_TAG}"
-        try {
+
             stage ('Docker Build') {
                 echo 'Docker Build'
                 buildImage(DOCKER_IMAGE, DOCKER_TAG)    
@@ -26,7 +26,7 @@ node {
                 echo 'Deploy to k8s'
                 deployK8s(DOCKER_IMAGE, DOCKER_TAG, NAMESPACE, MANIFEST_PATH, WORKSPACE, BUILD_ID)    
             }
-        }
+        
     } //dir
 } //node
 
