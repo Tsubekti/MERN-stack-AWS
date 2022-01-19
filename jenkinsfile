@@ -15,7 +15,7 @@ node {
 		
         currentBuild.displayName="#${BUILD_NUMBER}, ${JOB_NAME}, ${DOCKER_TAG}"
         try {
-            notifyBuild('STARTED', APP_NAME, TAG_NUMBER)
+            notifyBuild('STARTED', APP_NAME, DOCKER_TAG)
 
             stage ('Docker Pull') {
                 echo 'Docker Pull'
@@ -27,7 +27,7 @@ node {
             throw e
         } finally {
             // Success or failure, always send notifications
-            notifyBuild(currentBuild.result, APP_NAME, TAG_NUMBER)
+            notifyBuild(currentBuild.result, APP_NAME, DOCKER_TAG)
            // cleanWs()
         }   
         
