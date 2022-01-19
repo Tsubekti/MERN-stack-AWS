@@ -8,7 +8,7 @@ node {
 		]]       
 		def DOCKER_IMAGE = "tsubekti/todo-app-be"
         def DOCKER_TAG = gitTag()
-        def APP_NAME = todo-app
+        def APP_NAME = "todo-app"
 	    
 		def NAMESPACE = "production"
 		def MANIFEST_PATH = "backend"
