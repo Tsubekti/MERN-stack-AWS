@@ -4,7 +4,7 @@ node {
 
         checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[
 			url: "${APP_REPO_URL}"]], 
-			branches: [[name: "refs/tags/{tag}"]
+			branches: [[name: "refs/tags/${tag}"]
 		]]       
 		def DOCKER_IMAGE = "tsubekti/todo-app-be"
         def DOCKER_TAG = gitTag()
